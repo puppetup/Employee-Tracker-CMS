@@ -3,27 +3,31 @@ const mysql = require('mysql2')
 const inquirer = require('inquirer');
 const { default: test } = require('node:test');
 
-const connection = mysql.createConnection({
-    host: 'localhost',
-    user: 'root',
-    database: test
-})
+connection.query();
 
-connection.query()
-
+// Function that stores inquirer questions
 const promptUser = () => {
     return inquirer.prompt([
         {
-            type: 'input',
-            name: 'name',
-            message: 'is this working?'
+            type: 'list',
+            name: 'function',
+            choices: ['View all Employees', 'Add Employee', 'Update Employee Role', 'View All Roles', 'Add Role', 'View All Departments', 'Add Department', 'Quit']
         }
     ]);
 };
 
+// create connection to database
+const connection = mysql.createConnection({
+    host: 'localhost',
+    user: 'root',
+    database: test
+});
+
+
+
+//init function
 const init = () => {
     promptUser()
 };
 
 init()
-
