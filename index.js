@@ -2,15 +2,13 @@ const express = require('express')
 const mysql = require('mysql2')
 const inquirer = require('inquirer');
 
-
-// connection.query();
-
 // Function that stores inquirer questions
 const promptUser = () => {
     return inquirer.prompt([
         {
             type: 'list',
-            name: 'function',
+            name: 'choice',
+            message: 'What would you like to do?',
             choices: ['View All Employees', 'Add Employee', 'Update Employee Role', 'View All Roles', 'Add Role', 'View All Departments', 'Add Department', 'Quit'],
         },
 
@@ -45,16 +43,23 @@ const promptUser = () => {
     });
 };
 
-
-
 // create connection to database
-// const connection = mysql.createConnection({
-//     host: 'localhost',
-//     user: 'root',
-//     database: 'employee_db',
-// });
+const connection = mysql.createConnection({
+    host: 'localhost',
+    user: 'root',
+    password: 'password',
+    database: 'employee_db',
+});
 
-
+// show all dept
+function viewDepartments() {
+    connection.query(
+        'SELECT * FROM department',
+        function(err, results){
+            console.log(results)
+        }
+    )
+};
 
 //init function
 const init = () => {
