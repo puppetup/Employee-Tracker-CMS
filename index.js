@@ -1,6 +1,7 @@
 const express = require('express')
 const mysql = require('mysql2')
 const inquirer = require('inquirer');
+const cTable = require('console.table');
 
 // Function that stores inquirer questions
 const promptUser = () => {
@@ -55,6 +56,33 @@ const connection = mysql.createConnection({
 function viewDepartments() {
     connection.query(
         'SELECT * FROM department',
+        function(err, results){
+            console.table(results)
+        }
+    )
+};
+
+// prompt user to enter name of dept.
+function addDepartment() {
+    inquirer.prompt([
+        {
+            type: 'input',
+            name: 'name',
+            message: 'What is the name of the department?',
+        },
+    ])
+    .then((department) => {
+        addDepartDb(department.name)
+    })
+    .then(() => {
+        promptUser()
+    })    
+};
+
+// query to add dpt to sql 
+function addDepartDb(dpName) {
+    connection.promise().query(
+        'INSERT INTO department (name) VALUE (?)', dpName, 
         function(err, results){
             console.log(results)
         }
