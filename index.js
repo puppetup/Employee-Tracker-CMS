@@ -25,16 +25,16 @@ const promptUser = () => {
             case 'Update Employee Role':
                 updateRole();
                 break;
-            case 'View All Roles':
+            case 'View All Roles': //completed
                 viewRoles();
                 break;
-            case 'Add Role':
+            case 'Add Role': 
                 addRole();
                 break;
-            case 'View All Departments':
+            case 'View All Departments': //completed
                 viewDepartments();
                 break;
-            case 'Add Department':
+            case 'Add Department': //completed
                 addDepartment();
                 break;
             case 'Quit':
@@ -58,8 +58,10 @@ function viewDepartments() {
         'SELECT * FROM department',
         function(err, results){
             console.table(results)
+            promptUser()
         }
     )
+    
 };
 
 // prompt user to enter name of dept.
@@ -85,6 +87,79 @@ function addDepartDb(dpName) {
         'INSERT INTO department (name) VALUE (?)', dpName, 
         function(err, results){
             console.log(results)
+        }
+    )
+};
+
+// show all roles
+function viewRoles() {
+    connection.query(
+        'SELECT * FROM role',
+        function(err, results){
+            console.table(results)
+        }
+    )
+};
+
+// prompt user to enter  title, salary, and dept for new role
+function addRole() {
+    let departmentNames = []
+
+    connection.query(
+        'SELECT name FROM department',
+        (err, results) => {
+            if(err) {
+                console.log(err)
+            } 
+            departmentNames = results.map( a => a.name )
+
+            inquirer.prompt([
+                {
+                    type: 'input',
+                    name: 'title',
+                    message: 'What is the name of the role?',
+                },
+                {
+                    type: 'number',
+                    name: 'salary',
+                    message: 'What is the salary for this role?',
+                },
+                {
+                    type: 'list',
+                    name: 'department',
+                    message: 'What department does this role belong to?',
+                    choices: departmentNames
+                },
+            ])
+            .then((answers) => {
+                addRoleDb(answers.title, answers.salary, answers.department)
+            })
+            .then(() => {
+                promptUser()
+            }) 
+
+        }
+    )
+};
+
+
+
+// // add the role to sql
+function addRoleDb(roleName, roleSalary, dptId) {
+    connection.promise().query(
+        'INSERT INTO role (title, salary, department_id) VALUE (?, ?, ?)', [roleName, roleSalary, dptId],
+        function(err, results){
+            console.log(results)
+        }
+    )
+};
+
+// view all employees
+function viewEmployees() {
+    connection.query(
+        'SELECT * FROM employee',
+        function(err, results){
+            console.table(results)
         }
     )
 };
