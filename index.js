@@ -16,7 +16,7 @@ const promptUser = () => {
     ])
     .then((answer) => {
         switch (answer.choice) {
-            case 'View All Employees':
+            case 'View All Employees': // completed
                 viewEmployees();
                 break;
             case 'Add Employee':
@@ -97,6 +97,7 @@ function viewRoles() {
         'SELECT * FROM role',
         function(err, results){
             console.table(results)
+            promptUser()
         }
     )
 };
@@ -142,8 +143,6 @@ function addRole() {
     )
 };
 
-
-
 // // add the role to sql
 function addRoleDb(roleName, roleSalary, dptId) {
     connection.promise().query(
@@ -160,6 +159,53 @@ function viewEmployees() {
         'SELECT * FROM employee',
         function(err, results){
             console.table(results)
+            promptUser()
+        }
+    )
+};
+
+// add employee prompts
+function addEmployee() {
+    let departmentNames = []
+
+    connection.query(
+        'SELECT name FROM department',
+        (err, results) => {
+            if(err) {
+                console.log(err)
+            } 
+            departmentNames = results.map( a => a.name )
+
+            inquirer.prompt([
+                {
+                    type: 'input',
+                    name: 'first',
+                    message: 'What is the first name of the employee?',
+                },
+                {
+                    type: 'input',
+                    name: 'last',
+                    message: 'What is the last name of the employee?',
+                },
+                {
+                    type: 'number',
+                    name: 'role',
+                    message: 'What is the employees role?',
+                },
+                {
+                    type: 'list',
+                    name: 'Manager',
+                    message: 'Who is the employees manager?',
+                    choices: departmentNames,
+                },
+            ])
+            .then((answers) => {
+                addRoleDb(answers.title, answers.salary, answers.department)
+            })
+            .then(() => {
+                promptUser()
+            }) 
+
         }
     )
 };
