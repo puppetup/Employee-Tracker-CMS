@@ -104,15 +104,19 @@ function viewRoles() {
 
 // prompt user to enter  title, salary, and dept for new role
 function addRole() {
-    let departmentNames = []
+    let departmentNames = [];
+    let departmentNamesId = [];
 
     connection.query(
-        'SELECT name FROM department',
+        'SELECT id, name FROM department',
         (err, results) => {
             if(err) {
                 console.log(err)
             } 
-            departmentNames = results.map( a => a.name )
+            departmentNames = results
+            departmentNamesId = departmentNames.map(element => {
+                return {name: element.name, value: element.id}
+            });   
 
             inquirer.prompt([
                 {
@@ -129,7 +133,7 @@ function addRole() {
                     type: 'list',
                     name: 'department',
                     message: 'What department does this role belong to?',
-                    choices: departmentNames
+                    choices: departmentNamesId
                 },
             ])
             .then((answers) => {
