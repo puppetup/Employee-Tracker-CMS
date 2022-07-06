@@ -184,13 +184,29 @@ function addEmployee() {
     let managerChoices = []
     let managerChoicesId = []
     connection.query(
-        
+        `SELECT employee.id, first_name, last_name, title, role.id FROM employee
+        JOIN role ON employee.role_id = role.id; `,
         (err, results) => {
             if(err) {
                 console.log(err)
             } 
-            departmentNames = results.map( a => a.name )
-
+            managerChoices = results
+            managerChoicesId = managerChoices.map(element=> {
+                return {name: `${element.first_name} ${element.last_name}`, value: element.id}
+            })
+            managerChoicesId.unshift({name:"none", value:null});
+            connection.query(
+            `SELECT id, title
+            FROM role;`, 
+            (err,results) => {
+                if(err) {
+                    console.log(err)
+                }
+                roleChoices = results
+                roleChoicesId = roleChoices.map(element => {
+                    return {name: element.title, value: element.id}
+                })
+        
             inquirer.prompt([
                 {
                     type: 'input',
@@ -203,27 +219,37 @@ function addEmployee() {
                     message: 'What is the last name of the employee?',
                 },
                 {
-                    type: 'number',
-                    name: 'role',
+                    type: 'list',
+                    name: 'roleChoice',
                     message: 'What is the employees role?',
+                    choices: roleChoicesId
                 },
                 {
                     type: 'list',
-                    name: 'Manager',
+                    name: 'managerChoice',
                     message: 'Who is the employees manager?',
-                    choices: departmentNames,
+                    choices: managerChoicesId
                 },
             ])
             .then((answers) => {
-                addRoleDb(answers.title, answers.salary, answers.department)
+                addEmployeeDb(answers.first, answers.last, answers.roleChoice, answers.managerChoice)
             })
             .then(() => {
                 promptUser()
             }) 
+        })
+    })
+};
 
+function addEmployeeDb(firstName, lastName, employeeRole, employeeManager) {
+    connection.promise().query(
+        'INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUE (?, ?, ?, ?)', [firstName, lastName, employeeRole, employeeManager], 
+        function(err, results){
+            console.log(results)
         }
     )
-};
+} 
+
 
 //init function
 const init = () => {
