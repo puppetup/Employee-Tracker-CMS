@@ -3,6 +3,7 @@ const mysql = require('mysql2')
 const inquirer = require('inquirer');
 const cTable = require('console.table');
 const e = require('express');
+const logo = require('asciiart-logo');
 
 // create connection to database
 const connection = mysql.createConnection({
@@ -14,6 +15,7 @@ const connection = mysql.createConnection({
 
 // Function that stores inquirer questions
 const promptUser = () => {
+    
     return inquirer.prompt([
         {
             type: 'list',
@@ -320,6 +322,14 @@ function updateEmployeeDb(newRole, employeeName) {
 
 //init function
 const init = () => {
+    console.log(
+        logo({
+            name:'Employee Tracker',
+            borderColor: 'grey',
+            logoColor: 'bold-white',
+        })
+        .render()
+    );
     promptUser()
 };
 
