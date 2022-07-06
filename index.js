@@ -3,6 +3,14 @@ const mysql = require('mysql2')
 const inquirer = require('inquirer');
 const cTable = require('console.table');
 
+// create connection to database
+const connection = mysql.createConnection({
+    host: 'localhost',
+    user: 'root',
+    password: 'password',
+    database: 'employee_db',
+});
+
 // Function that stores inquirer questions
 const promptUser = () => {
     return inquirer.prompt([
@@ -44,13 +52,6 @@ const promptUser = () => {
     });
 };
 
-// create connection to database
-const connection = mysql.createConnection({
-    host: 'localhost',
-    user: 'root',
-    password: 'password',
-    database: 'employee_db',
-});
 
 // show all dept
 function viewDepartments() {
@@ -160,7 +161,14 @@ function addRoleDb(roleName, roleSalary, dptId) {
 // view all employees
 function viewEmployees() {
     connection.query(
-        'SELECT * FROM employee',
+        `SELECT e.id, e.first_name, e.last_name, role.title, department.name AS department, role.salary, CONCAT(m.first_name, ' ' ,m.last_name) AS Manager
+        FROM employee e 
+        LEFT JOIN employee m 
+        ON e.manager_id = m.id
+        JOIN role
+        ON e.role_id = role.id
+        JOIN department
+        ON role.department_id = department.id;`,
         function(err, results){
             console.table(results)
             promptUser()
@@ -170,10 +178,13 @@ function viewEmployees() {
 
 // add employee prompts
 function addEmployee() {
-    let departmentNames = []
+    let roleChoices = []
+    let roleChoicesId = []
 
+    let managerChoices = []
+    let managerChoicesId = []
     connection.query(
-        'SELECT name FROM department',
+        
         (err, results) => {
             if(err) {
                 console.log(err)

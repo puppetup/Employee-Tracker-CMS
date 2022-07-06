@@ -23,14 +23,10 @@ CREATE TABLE employee (
     id INT PRIMARY KEY AUTO_INCREMENT,
     first_name VARCHAR(30),
     last_name VARCHAR(30),
-    manager_status BOOLEAN,
     role_id INT,
     FOREIGN KEY (role_id)
-    REFERENCES department(id),
-    manager_id INT,
-    FOREIGN KEY (manager_id)
+    REFERENCES role(id),
+    manager_id INT
     REFERENCES employee(id)
 );
-
-
 
