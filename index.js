@@ -2,6 +2,7 @@ const express = require('express')
 const mysql = require('mysql2')
 const inquirer = require('inquirer');
 const cTable = require('console.table');
+const e = require('express');
 
 // create connection to database
 const connection = mysql.createConnection({
@@ -241,6 +242,7 @@ function addEmployee() {
     })
 };
 
+//add employee to database
 function addEmployeeDb(firstName, lastName, employeeRole, employeeManager) {
     connection.promise().query(
         'INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUE (?, ?, ?, ?)', [firstName, lastName, employeeRole, employeeManager], 
@@ -248,8 +250,73 @@ function addEmployeeDb(firstName, lastName, employeeRole, employeeManager) {
             console.log(results)
         }
     )
-} 
+};
 
+//updates employee
+function updateRole() {
+    let roleChoices = []
+    let roleChoicesId = []
+
+    let employeeChoices = []
+    let employeeChoicesId = []
+
+    connection.query(
+        `SELECT employee.id, first_name, last_name, title, role.id 
+        FROM employee
+        JOIN role ON employee.role_id = role.id;`,
+        (err,results) => {
+            if (err) {
+                console.log(err);
+            }
+            employeeChoices = results
+            employeeChoicesId = employeeChoices.map(element => {
+                return {name: `${element.first_name} ${element.last_name}`,
+                    value: element.id}
+            })
+            connection.query(
+                `SELECT id, title
+                FROM role;`, 
+                (err,results) => {
+                    if(err) {
+                        console.log(err)
+                    }
+                    roleChoices = results
+                    roleChoicesId = roleChoices.map(element => {
+                        return {name: element.title, value: element.id}
+                    })
+            inquirer.prompt([
+                {
+                    type: 'list',
+                    name: 'employeeName',
+                    message: 'What is the namke of the employee?',
+                    choices: employeeChoicesId
+                },
+                {
+                    type: 'list',
+                    name: 'roleChoice',
+                    message: 'What is the employees new role?',
+                    choices: roleChoicesId
+                },
+            ])
+            .then((answers) => { 
+                updateEmployeeDb(answers.roleChoice, answers.employeeName)
+            })
+            .then(() => {
+                promptUser()
+            })
+        })    
+        }
+    )
+};
+
+// add updated info to database
+function updateEmployeeDb(newRole, employeeName) {
+    connection.promise().query(`UPDATE employee SET role_id = ? WHERE id = ?`, [newRole, employeeName],
+    function(err,results){
+        console.log(results)
+        }
+    )
+};
 
 //init function
 const init = () => {
