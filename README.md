@@ -14,6 +14,6 @@ Clone onto machine and open root directory, then input "node index.js" to initia
 
 ## Links
 
-(Link to Github Repo)[https://github.com/puppetup/Employee-Tracker-CMS]
+[Link to Github Repo](https://github.com/puppetup/Employee-Tracker-CMS)
 
-(Link to Video Walkthrough)[https://youtu.be/evGt_OC9y9k]
+[Link to Video Walkthrough](https://youtu.be/evGt_OC9y9k)
